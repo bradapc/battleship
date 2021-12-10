@@ -2,6 +2,7 @@ const createShip = function(length) {
     length = length;
     health = Array(length).fill(0);
     sunk = false;
+    coordinates = [];
     const isSunk = () => {
         for(let i = 0; i < health.length; i++) {
             if(health[i] === 0) {
@@ -15,12 +16,13 @@ const createShip = function(length) {
     const hit = (num) => {
         health[num] = 1;
     }
-    return {length, health, isSunk, hit};
+    return {length, health, isSunk, hit, coordinates};
 }
 
 const createGameboard = function() {
     const size = 10;
-    board = []
+    let board = []
+    let ships = [];
     init();
     function init() {
         for(let i = 0; i < size; i++) {
@@ -30,13 +32,37 @@ const createGameboard = function() {
             }
         }
     }
-    const addShipToBoard = function(length, pos) {
+    const addShipToBoard = function(length, row, col) {
         const newShip = createShip(length);
         for(let i = 0; i < length; i++) {
-            board[pos + i].isShip = true;
+            board[row][col + i].isShip = true;
+            newShip.coordinates.push([row, col + i]);
+        }
+        ships.push(newShip);
+    }
+    const receiveAttack = (row, col) => {
+        board[row][col].isShot = true;
+        if(board[row][col].isShip) {
+            for(let i = 0; i < ships.length; i++) {
+                for(let j = 0; j < ships[i].coordinates.length; j++) {
+                    if(ships[i].coordinates[j][0] == [row] && ships[i].coordinates[j][1] == [col]) {
+                        ships[i].hit(j);
+                    }
+                }
+            }
         }
     }
-    return {addShipToBoard, board};
+    const checkAllShipsSunk = () => {
+        for(let i = 0; i < ships.length; i++) {
+            if(ships[i].isSunk()) {
+                continue;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+    return {addShipToBoard, board, receiveAttack, ships, checkAllShipsSunk};
 }
 
 exports.createGameboard = createGameboard;

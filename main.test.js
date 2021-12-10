@@ -28,8 +28,60 @@ test('Is battleship of length 2 that has been hit twice sunk?', () => {
     expect(ship.isSunk()).toBe(false);
 })
 
-test('Adding a 2 length ship to spot 4', () => {
+test('Adding a 2 length ship to row 0 col 3', () => {
     const board = main.createGameboard();
-    board.addShipToBoard(2, 4);
-    expect(board.board[4].isShip).toEqual(true);
+    board.addShipToBoard(2, 0, 3);
+    expect(board.board[0][3].isShip).toEqual(true);
+})
+
+test('Board is not shot on init', () => {
+    const board = main.createGameboard();
+    expect(board.board[0][3].isShot).toEqual(false);
+})
+
+test('Board receives hit at row 0 col 3', () => {
+    const board = main.createGameboard();
+    board.receiveAttack(0, 3);
+    expect(board.board[0][3].isShot).toEqual(true);
+})
+
+test('Gameboard keeps track of newly added ships', () => {
+    const board = main.createGameboard();
+    board.addShipToBoard(2, 0, 3);
+    expect(board.ships[0]).not.toBeUndefined();
+})
+
+test('Ship receives coordinates when added to board', () => {
+    const board = main.createGameboard();
+    board.addShipToBoard(2, 0, 3);
+    expect(board.ships[0].coordinates[0]).toEqual([0, 3]);
+})
+
+test('Health of ship changes on board hit where ship is', () => {
+    const board = main.createGameboard();
+    board.addShipToBoard(2, 0, 3);
+    board.receiveAttack(0, 3);
+    expect(board.ships[0].health).toContain(1);
+})
+
+test('Ship sinks after losing all health', () => {
+    const board = main.createGameboard();
+    board.addShipToBoard(2, 0, 3);
+    board.receiveAttack(0, 3);
+    board.receiveAttack(0, 4);
+    expect(board.ships[0].isSunk()).toBe(true);
+})
+
+test('Check if all ships sunk when a ship is still alive (should be false)', () => {
+    const board = main.createGameboard();
+    board.addShipToBoard(2, 0, 3);
+    expect(board.checkAllShipsSunk()).toBe(false);
+})
+
+test('Check if all ships sunk when all ships are sunk (should be true)', () => {
+    const board = main.createGameboard();
+    board.addShipToBoard(2, 0, 3);
+    board.receiveAttack(0, 3);
+    board.receiveAttack(0, 4);
+    expect(board.checkAllShipsSunk()).toBe(true);
 })
