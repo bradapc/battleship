@@ -65,5 +65,19 @@ const createGameboard = function() {
     return {addShipToBoard, board, receiveAttack, ships, checkAllShipsSunk};
 }
 
+const createPlayer = function() {
+    const board = createGameboard();
+    board.addShipToBoard(5, 0, 0);
+    board.addShipToBoard(4, 1, 0);
+    board.addShipToBoard(3, 2, 0);
+    board.addShipToBoard(3, 3, 0);
+    board.addShipToBoard(2, 4, 0);
+    return {board};
+}
+
+const player = createPlayer();
+const computer = createPlayer();
+
+
 exports.createGameboard = createGameboard;
 exports.createShip = createShip;
