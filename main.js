@@ -78,6 +78,7 @@ const createPlayer = function(type) {
 const game = (() => {
     const player = createPlayer('player');
     const computer = createPlayer('computer');
+    let turn = 'player';
     function updateDOM() {
         const playerBoard = document.getElementById('player');
         const computerBoard = document.getElementById('computer');
@@ -94,6 +95,9 @@ const game = (() => {
                     const missMarker = document.createElement('div');
                     missMarker.classList.add('miss-marker');
                     gameTile.appendChild(missMarker);
+                    if(computer.gameboard.board[i][j].isShip) {
+                        missMarker.style.backgroundColor = 'red';
+                    }
                 }
             }
         }
@@ -105,18 +109,58 @@ const game = (() => {
                 gameTile.setAttribute('col', j);
                 computerBoard.appendChild(gameTile);
                 gameTile.addEventListener('click', () => {
-                    computer.gameboard.receiveAttack(gameTile.getAttribute('row'), gameTile.getAttribute('col'));
-                    updateDOM();
+                    handleAttack('computer', gameTile.getAttribute('row'), gameTile.getAttribute('col'));
                 });
                 if(computer.gameboard.board[i][j].isShot) {
                     const missMarker = document.createElement('div');
                     missMarker.classList.add('miss-marker');
                     gameTile.appendChild(missMarker);
+                    if(computer.gameboard.board[i][j].isShip) {
+                        missMarker.style.backgroundColor = 'red';
+                    }
                 }
             }
         }
     }
     updateDOM();
+    function handleAttack(type, row, col) {
+        if(type === 'computer') {
+            if(isValidAttack('computer', row, col) && turn === 'player') {
+                computer.gameboard.receiveAttack(row, col);
+                turn = 'computer';
+                updateDOM();
+                computerAttack();
+            }
+        } else if(type === 'player') {
+            player.gameboard.receiveAttack(row, col);
+            turn = 'player';
+            updateDOM();
+        }
+    }
+    function isValidAttack(type, row, col) {
+        if(type === 'computer') {
+            if(computer.gameboard.board[row][col].isShot) {
+                return false;
+            } else {
+                return true;
+            }
+        } else if(type === 'player') {
+            if(player.gameboard.board[row][col].isShot) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+    function computerAttack() {
+        let row;
+        let col;
+        do {
+            row = Math.floor(Math.random() * 10);
+            col = Math.floor(Math.random() * 10);
+        } while(!isValidAttack('player', row, col));
+        handleAttack('player', row, col);
+    }
 })();
 
 
