@@ -1,7 +1,6 @@
 const createShip = function(length) {
-    length = length;
-    health = Array(length).fill(0);
-    sunk = false;
+    length;
+    const health = new Array(length).fill(0);
     coordinates = [];
     const isSunk = () => {
         for(let i = 0; i < health.length; i++) {
@@ -109,7 +108,9 @@ const game = (() => {
                 gameTile.setAttribute('col', j);
                 computerBoard.appendChild(gameTile);
                 gameTile.addEventListener('click', () => {
-                    handleAttack('computer', gameTile.getAttribute('row'), gameTile.getAttribute('col'));
+                    if(!checkForWin()){
+                        handleAttack('computer', gameTile.getAttribute('row'), gameTile.getAttribute('col'));
+                    }
                 });
                 if(computer.gameboard.board[i][j].isShot) {
                     const missMarker = document.createElement('div');
@@ -129,12 +130,15 @@ const game = (() => {
                 computer.gameboard.receiveAttack(row, col);
                 turn = 'computer';
                 updateDOM();
-                computerAttack();
+                if(!checkForWin()) {
+                    computerAttack();
+                }
             }
         } else if(type === 'player') {
             player.gameboard.receiveAttack(row, col);
             turn = 'player';
             updateDOM();
+            checkForWin();
         }
     }
     function isValidAttack(type, row, col) {
@@ -160,6 +164,16 @@ const game = (() => {
             col = Math.floor(Math.random() * 10);
         } while(!isValidAttack('player', row, col));
         handleAttack('player', row, col);
+    }
+    function checkForWin() {
+        if(player.gameboard.checkAllShipsSunk()) {
+            alert('Computer wins!');
+            return true;
+        } else if(computer.gameboard.checkAllShipsSunk()) {
+            alert('Player wins!');
+            return true;
+        }
+        return false;
     }
 })();
 
