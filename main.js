@@ -65,18 +65,43 @@ const createGameboard = function() {
     return {addShipToBoard, board, receiveAttack, ships, checkAllShipsSunk};
 }
 
-const createPlayer = function() {
-    const board = createGameboard();
-    board.addShipToBoard(5, 0, 0);
-    board.addShipToBoard(4, 1, 0);
-    board.addShipToBoard(3, 2, 0);
-    board.addShipToBoard(3, 3, 0);
-    board.addShipToBoard(2, 4, 0);
-    return {board};
+const createPlayer = function(type) {
+    const gameboard = createGameboard();
+    gameboard.addShipToBoard(5, 0, 0);
+    gameboard.addShipToBoard(4, 1, 0);
+    gameboard.addShipToBoard(3, 2, 0);
+    gameboard.addShipToBoard(3, 3, 0);
+    gameboard.addShipToBoard(2, 4, 0);
+    return {gameboard};
 }
 
-const player = createPlayer();
-const computer = createPlayer();
+const game = (() => {
+    const player = createPlayer('player');
+    const computer = createPlayer('computer');
+    function updateDOM() {
+        const playerBoard = document.getElementById('player');
+        const computerBoard = document.getElementById('computer');
+        for(let i = 0; i < player.gameboard.board.length; i++) {
+            for(let j = 0; j < player.gameboard.board[i].length; j++) {
+                const gameTile = document.createElement('div');
+                gameTile.classList.add('game-tile');
+                gameTile.setAttribute('row', i);
+                gameTile.setAttribute('col', j);
+                playerBoard.appendChild(gameTile);
+            }
+        }
+        for(let i = 0; i < computer.gameboard.board.length; i++) {
+            for(let j = 0; j < computer.gameboard.board[i].length; j++) {
+                const gameTile = document.createElement('div');
+                gameTile.classList.add('game-tile');
+                gameTile.setAttribute('row', i);
+                gameTile.setAttribute('col', j);
+                computerBoard.appendChild(gameTile);
+            }
+        }
+    }
+    updateDOM();
+})();
 
 
 exports.createGameboard = createGameboard;
