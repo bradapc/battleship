@@ -14,9 +14,19 @@
     height: 48px;
     border: 1px solid black;
     flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .board-container {
     display: flex;
     gap: 8px;
+}
+
+.miss-marker {
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
 }

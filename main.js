@@ -81,6 +81,8 @@ const game = (() => {
     function updateDOM() {
         const playerBoard = document.getElementById('player');
         const computerBoard = document.getElementById('computer');
+        const tileDOM = document.querySelectorAll('.game-tile');
+        tileDOM.forEach(element => element.remove());
         for(let i = 0; i < player.gameboard.board.length; i++) {
             for(let j = 0; j < player.gameboard.board[i].length; j++) {
                 const gameTile = document.createElement('div');
@@ -88,6 +90,11 @@ const game = (() => {
                 gameTile.setAttribute('row', i);
                 gameTile.setAttribute('col', j);
                 playerBoard.appendChild(gameTile);
+                if(player.gameboard.board[i][j].isShot) {
+                    const missMarker = document.createElement('div');
+                    missMarker.classList.add('miss-marker');
+                    gameTile.appendChild(missMarker);
+                }
             }
         }
         for(let i = 0; i < computer.gameboard.board.length; i++) {
@@ -97,6 +104,15 @@ const game = (() => {
                 gameTile.setAttribute('row', i);
                 gameTile.setAttribute('col', j);
                 computerBoard.appendChild(gameTile);
+                gameTile.addEventListener('click', () => {
+                    computer.gameboard.receiveAttack(gameTile.getAttribute('row'), gameTile.getAttribute('col'));
+                    updateDOM();
+                });
+                if(computer.gameboard.board[i][j].isShot) {
+                    const missMarker = document.createElement('div');
+                    missMarker.classList.add('miss-marker');
+                    gameTile.appendChild(missMarker);
+                }
             }
         }
     }
