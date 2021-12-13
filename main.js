@@ -15,7 +15,7 @@ const createShip = function(length) {
     const hit = (num) => {
         health[num] = 1;
     }
-    return {length, health, isSunk, hit, coordinates};
+    return {length, isSunk, hit, coordinates};
 }
 
 const createGameboard = function() {
@@ -61,23 +61,120 @@ const createGameboard = function() {
         }
         return true;
     }
-    return {addShipToBoard, board, receiveAttack, ships, checkAllShipsSunk};
+    return {addShipToBoard, board, receiveAttack, checkAllShipsSunk};
 }
 
-const createPlayer = function(type) {
+const createPlayer = function(){
     const gameboard = createGameboard();
-    gameboard.addShipToBoard(5, 0, 0);
-    gameboard.addShipToBoard(4, 1, 0);
-    gameboard.addShipToBoard(3, 2, 0);
-    gameboard.addShipToBoard(3, 3, 0);
-    gameboard.addShipToBoard(2, 4, 0);
     return {gameboard};
 }
 
+const shipTypes = [
+    {
+        name: 'Carrier',
+        length: 5
+    },
+    {
+        name: 'Battleship',
+        length: 4
+    },
+    {
+        name: 'Cruiser',
+        length: 3
+    },
+    {
+        name: 'Submarine',
+        length: 3
+    },
+    {
+        name: 'Destroyer',
+        length: 2
+    }
+]
+
 const game = (() => {
-    const player = createPlayer('player');
-    const computer = createPlayer('computer');
+    const player = createPlayer();
+    const computer = createPlayer();
     let turn = 'player';
+    let currentShip = shipTypes[0];
+    let currentIndex = 0;
+    let currentShipAI = shipTypes[0];
+    let currentIndexAI = 0;
+    let playerInit = false;
+    function initGame() {
+        if(playerInit === false) {
+            document.querySelector('.board-container').style.display = 'none';
+            const initBoard = document.querySelector('.init-board');
+            for(let i = 0; i < 10; i++) {
+                for(let j = 0; j < 10; j++) {
+                    const initGameTile = document.createElement('div');
+                    initGameTile.classList.add('init-tile');
+                    initGameTile.setAttribute('row', i);
+                    initGameTile.setAttribute('col', j);
+                    initBoard.appendChild(initGameTile);
+                }
+            }
+            const addButton = document.querySelector('#submitcoords');
+            addButton.addEventListener('click', () => {
+                submitShipCoords();
+            })
+        }
+    }
+    initGame();
+    function submitShipCoords() {
+        const initTile = document.querySelectorAll('.init-tile');
+        let rowInput = document.querySelector('#coordrow');
+        let colInput = document.querySelector('#coordcol');
+        rowInput = Number.parseInt(rowInput.value);
+        colInput = Number.parseInt(colInput.value);
+        if(colInput + currentShip.length - 1 < player.gameboard.board[rowInput].length && !player.gameboard.board[rowInput][colInput].isShip) {
+            player.gameboard.addShipToBoard(currentShip.length, rowInput, colInput);
+            const shipTiles = [];
+            for(let i = 0; i < currentShip.length; i++) {
+                shipTiles.push([rowInput, colInput + i]);
+            }
+            initTile.forEach(tile => {
+                for(let i = 0; i < shipTiles.length; i++) {
+                    if(tile.getAttribute('row') == shipTiles[i][0] && tile.getAttribute('col') == shipTiles[i][1]) {
+                        tile.style.backgroundColor = 'black';
+                    }
+                }
+            })
+            currentIndex += 1;
+            currentShip = shipTypes[currentIndex];
+            if(currentIndex > 4) {
+                playerInit = false;
+                startGame();
+            }
+        } else {
+            alert('bad');
+        }
+    }
+    function startGame() {
+        document.querySelector('.board-container').style.display = 'flex';
+        document.querySelector('.init-container').style.display = 'none';
+        computerRandomizeShips();
+    }
+    function computerRandomizeShips() {
+        for(let i = 0; i < shipTypes.length; i++) {
+            let row;
+            let col;
+            do {
+                row = Math.floor(Math.random() * 10);
+                col = Math.floor(Math.random() * 10);
+            } while(!isValidShipPlacement(row, col));
+            computer.gameboard.addShipToBoard(currentShipAI.length, row, col);
+            currentIndexAI += 1;
+            currentShipAI = shipTypes[currentIndexAI];
+        }
+    }
+    function isValidShipPlacement(row, col) {
+        if(col + currentShipAI.length - 1 < computer.gameboard.board[row].length && !computer.gameboard.board[row][col].isShip) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     function updateDOM() {
         const playerBoard = document.getElementById('player');
         const computerBoard = document.getElementById('computer');
@@ -97,6 +194,9 @@ const game = (() => {
                     if(computer.gameboard.board[i][j].isShip) {
                         missMarker.style.backgroundColor = 'red';
                     }
+                }
+                if(player.gameboard.board[i][j].isShip) {
+                    gameTile.style.backgroundColor = 'black';
                 }
             }
         }

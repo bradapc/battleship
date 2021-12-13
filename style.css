@@ -19,6 +19,10 @@
     align-items: center;
 }
 
+.game-tile:hover {
+    background-color: rgb(70, 141, 221);
+}
+
 .board-container {
     display: flex;
     gap: 8px;
@@ -29,4 +33,29 @@
     height: 20px;
     background-color: white;
     border-radius: 50%;
+}
+
+.init-board {
+    background-color: red;
+    max-width: 500px;
+    max-height: 500px;
+    min-width: 500px;
+    min-height: 500px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.init-tile {
+    background-color: rgb(44, 127, 221);
+    width: 48px;
+    height: 48px;
+    border: 1px solid black;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+h3 {
+    margin: 0;
 }
